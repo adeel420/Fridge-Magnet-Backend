@@ -21,7 +21,7 @@ exports.register = async (req, res) => {
 
     await newUser.save();
 
-    const verificationLink = `${process.env.CLIENT_URL}/auth/verify-email/${verificationToken}`;
+    const verificationLink = `https://fridge-magnets-frontend.vercel.app/auth/verify-email/${verificationToken}`;
     await transporter.sendMail({
       from: '"Photofy" <Info@photofy.co.uk>',
       to: email,
