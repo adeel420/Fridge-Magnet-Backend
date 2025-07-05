@@ -5,11 +5,10 @@ const imageSchema = new mongoose.Schema(
     images: [
       {
         url: { type: String, required: true },
+        message: { type: String, default: "" }, // ✅ This is correct
       },
     ],
-    text: {
-      type: String,
-    },
+
     product: {
       type: mongoose.Types.ObjectId,
       ref: "product",

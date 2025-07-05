@@ -3,10 +3,11 @@ const Image = require("../models/image");
 
 exports.create = async (req, res) => {
   try {
-    const { text, product } = req.body;
+    const { product, messages } = req.body;
 
-    console.log("req.body:", req.body);
-    console.log("req.files:", req.files);
+    const parsedMessages = Array.isArray(messages)
+      ? messages
+      : JSON.parse(messages);
 
     const foundProduct = await Product.findById(product);
     if (!foundProduct) {
@@ -16,19 +17,23 @@ exports.create = async (req, res) => {
     const requiredOrderCount = Number(foundProduct.orders);
     const files = req.files;
 
-    if (!files || files.length !== requiredOrderCount) {
+    if (
+      !files ||
+      files.length !== requiredOrderCount ||
+      parsedMessages.length !== requiredOrderCount
+    ) {
       return res.status(400).json({
-        error: `You must upload exactly ${requiredOrderCount} image(s) for this product.`,
+        error: `You must upload exactly ${requiredOrderCount} image(s) and messages.`,
       });
     }
 
-    const imageUrls = files.map((file) => ({
+    const imageData = files.map((file, index) => ({
       url: file.path || file.secure_url || file.url,
+      message: parsedMessages[index] || "", // safe fallback
     }));
 
     const newImageDoc = await Image.create({
-      images: imageUrls,
-      text,
+      images: imageData,
       product,
     });
 
