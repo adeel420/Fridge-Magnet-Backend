@@ -21,7 +21,7 @@ io.on("connection", (socket) => {
 app.set("io", io);
 
 app.get("/", (req, res) => {
-  res.send("Hi");
+  res.send("Hello world!");
 });
 
 // Files
