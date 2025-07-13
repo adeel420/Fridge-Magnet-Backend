@@ -5,8 +5,15 @@ const Size = require("../models/size");
 
 exports.addToCart = async (req, res) => {
   try {
-    const { productId, uploadedImageId, sizeId, quantity = 1 } = req.body;
-    const userId = req.user.id;
+    const {
+      cartId,
+      productId,
+      uploadedImageId,
+      sizeId,
+      quantity = 1,
+    } = req.body;
+
+    if (!cartId) return res.status(400).json({ error: "cartId is required" });
 
     const product = await Product.findById(productId);
     const size = await Size.findById(sizeId);
@@ -22,11 +29,11 @@ exports.addToCart = async (req, res) => {
         .status(400)
         .json({ error: "Image does not belong to the product" });
 
-    let cart = await Cart.findOne({ user: userId });
+    let cart = await Cart.findOne({ cartId });
 
     if (!cart) {
       cart = new Cart({
-        user: userId,
+        cartId,
         products: [
           {
             product: productId,
@@ -64,18 +71,22 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-exports.getByUserId = async (req, res) => {
+exports.getByCartId = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const cartId = req.params.cartId;
 
-    const data = await Cart.find({ user: userId })
+    const data = await Cart.findOne({ cartId })
       .populate("products.product")
       .populate("products.uploadedImages")
       .populate("products.size");
 
+    if (!data) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
     res.status(200).json(data);
   } catch (err) {
-    console.error("Get cart by userId error:", err);
+    console.error("Get cart by cartId error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };

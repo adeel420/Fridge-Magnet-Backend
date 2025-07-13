@@ -34,11 +34,28 @@ router.post("/create-payment-intent", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { products, payment, buyer, status, phone, address, sizeId } =
-      req.body;
+    const {
+      products,
+      payment,
+      buyer,
+      name,
+      email,
+      status,
+      phone,
+      address,
+      sizeId,
+    } = req.body;
 
-    if (!products || !payment || !buyer || !phone || !address) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (
+      !products ||
+      !payment ||
+      !buyer ||
+      !phone ||
+      !address ||
+      name ||
+      email
+    ) {
+      return;
     }
 
     const populatedBuyer = await User.findById(buyer);
@@ -67,6 +84,8 @@ router.post("/", async (req, res) => {
       phone,
       address,
       sizeId,
+      name,
+      email,
       status: status || "not process",
     });
     await order.save();
@@ -79,7 +98,7 @@ router.post("/", async (req, res) => {
     // Send email to customer
     await transporter.sendMail({
       from: '"Photofy" <Info@photofy.co.uk>',
-      to: populatedBuyer.email,
+      to: email,
       subject: "Photofy - Order Confirmation",
       html: `
         <div style="font-family: Arial, sans-serif; background-color: #ffffff; color: #333333; padding: 20px; margin: 0;">
@@ -89,9 +108,7 @@ router.post("/", async (req, res) => {
             </div>
 
             <div style="padding: 20px;">
-              <p style="font-size: 16px;">Hi <strong>${
-                populatedBuyer.name
-              }</strong>,</p>
+              <p style="font-size: 16px;">Hi <strong>${name}</strong>,</p>
               <p style="font-size: 16px;">
                 Thank you for your order! We're excited to let you know that we've received your payment and your order is now being processed.
               </p>
@@ -116,7 +133,7 @@ router.post("/", async (req, res) => {
 
               <h2 style="color: #ef4423; font-size: 18px; border-bottom: 2px solid #ef4423; display: inline-block; padding-bottom: 4px; margin-top: 25px;">🚚 Shipping Information</h2>
               <div style="margin-top: 10px; line-height: 1.6; font-size: 15px;">
-                <p><strong>Name:</strong> ${populatedBuyer.name}</p>
+                <p><strong>Name:</strong> ${name}</p>
                 <p><strong>Phone:</strong> ${phone}</p>
                 <p><strong>Address:</strong> ${address}</p>
               </div>
@@ -160,8 +177,8 @@ router.post("/", async (req, res) => {
       <hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;" />
 
       <h2 style="color: #ef4423; font-size: 18px; margin-bottom: 15px;">👤 Buyer Information</h2>
-      <p><strong>Name:</strong> ${populatedBuyer.name}</p>
-      <p><strong>Email:</strong> ${populatedBuyer.email}</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
       <p><strong>Phone:</strong> ${phone}</p>
       <p><strong>Address:</strong> ${address}</p>
 

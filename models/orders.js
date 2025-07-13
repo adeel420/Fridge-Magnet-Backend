@@ -30,6 +30,8 @@ const OrderSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
+    name: String,
+    email: String,
     phone: {
       type: String,
     },
