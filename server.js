@@ -36,6 +36,7 @@ const paymentRoutes = require("./routes/ordersRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const eventsBookRoutes = require("./routes/eventsBookRoutes");
 const sizeRoutes = require("./routes/sizeRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 // Routes
 app.use("/user", userRoutes);
@@ -49,6 +50,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/cart", cartRoutes);
 app.use("/events-book", eventsBookRoutes);
 app.use("/size", sizeRoutes);
+app.use("/category", categoryRoutes);
 
 //  Packages
 const PORT = process.env.PORT;

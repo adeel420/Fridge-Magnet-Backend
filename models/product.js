@@ -14,6 +14,11 @@ const productSchema = new mongoose.Schema({
     ref: "size",
     required: true,
   },
+  category: {
+    type: mongoose.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
   price: { type: String, required: true },
   perfectFor: [{ type: String }],
 });

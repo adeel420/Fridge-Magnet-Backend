@@ -1,17 +1,23 @@
+const Category = require("../models/category");
 const Product = require("../models/product");
 const Size = require("../models/size");
 
 exports.create = async (req, res) => {
   try {
-    const { title, description, orders, size, price, perfectFor } = req.body;
+    const { title, description, orders, size, category, price, perfectFor } =
+      req.body;
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "At least one image is required" });
     }
     const sizeId = await Size.findById(size);
+    const categoryId = await Category.findById(category);
 
     if (!sizeId) {
       return res.status(400).json({ error: "Invalid size ID" });
+    }
+    if (!categoryId) {
+      return res.status(400).json({ error: "Invalid category ID" });
     }
 
     const images = req.files.map((file) => ({
@@ -23,6 +29,7 @@ exports.create = async (req, res) => {
       description,
       orders,
       size: sizeId,
+      category: categoryId,
       price,
       perfectFor: Array.isArray(perfectFor) ? perfectFor : [perfectFor],
       images,
@@ -38,7 +45,14 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const response = await Product.find();
+    const { category } = req.query;
+    let filter = {};
+    
+    if (category) {
+      filter.category = category;
+    }
+    
+    const response = await Product.find(filter).populate('category').populate('size');
     res.status(200).json(response);
   } catch (err) {
     console.error(err);
